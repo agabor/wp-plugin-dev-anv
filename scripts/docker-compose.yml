@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  mariadb:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: secretpassword
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: secretpassword
+    volumes:
+      - "./dumps:/docker-entrypoint-initdb.d"
+      - ".:/scripts"
+
+  wordpress:
+    build:
+      dockerfile: wordpress.Dockerfile 
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: secretpassword
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - ../wordpress:/var/www/wordpress/
+      - ./logs:/var/log
+    depends_on:
+      - mariadb
+    links:
+      - mariadb
+    ports:
+      - "9000:9000"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8888:80"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ../wordpress:/var/www/wordpress/
+    depends_on:
+      - wordpress
+    links:
+      - wordpress
