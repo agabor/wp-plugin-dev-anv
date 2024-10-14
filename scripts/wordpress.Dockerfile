@@ -1,6 +1,6 @@
 FROM php:8.3-fpm
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install and enable Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
